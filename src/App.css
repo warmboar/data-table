@@ -1,96 +1,137 @@
-/* Базовые стили */
+
+:root {
+  --primary-bg: #f0f2f5;
+  --content-bg: #ffffff;
+  --border-color: #e8e8e8;
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --animation-duration: 0.3s;
+}
+
 body {
   margin: 0;
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f0f2f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--primary-bg);
   overflow-x: hidden;
+  color: #333;
+  line-height: 1.5;
 }
 
 .app-container {
   max-width: 1200px;
-  margin: 0 auto;
-  background: white;
-  padding: 24px;
+  margin: 2rem auto;
+  background: var(--content-bg);
+  padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-light);
+  min-height: calc(100vh - 40px);
+  box-sizing: border-box;
 }
 
-/* Стили для таблицы */
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animated {
+  animation: fadeIn var(--animation-duration) ease-out;
+}
+
+
 .ant-table-wrapper {
-  overflow-x: auto;
+  margin: 1.5rem 0;
 }
 
 .ant-table {
-  animation: fadeIn 0.3s ease-out;
-  margin-top: 16px;
+  animation: fadeIn var(--animation-duration) ease-out;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-/* Контейнер для таблицы */
-.table-container {
-  padding: 12px;
-  max-width: 100%;
-  overflow-x: auto;
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* Элементы управления таблицей */
-.table-controls {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  align-items: flex-start;
+::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
+  transition: background 0.2s;
 }
 
-.search-input {
-  flex-grow: 1;
+::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
 }
 
-/* Мобильная адаптация */
-@media (max-width: 767px) {
+
+@media (max-width: 992px) {
   .app-container {
-    padding: 16px;
+    padding: 1.5rem;
+    margin: 1rem auto;
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    padding: 10px;
   }
 
-  .table-controls {
-    flex-direction: column;
-  }
-  
-  .search-input,
-  .add-button {
-    width: 100% !important;
+  .app-container {
+    padding: 1rem;
+    margin: 0.5rem auto;
+    border-radius: 0;
   }
 
   .ant-table {
     font-size: 14px;
   }
-  
+
   .ant-table-thead > tr > th,
   .ant-table-tbody > tr > td {
-    padding: 8px !important;
+    padding: 10px 8px !important;
   }
-  
+
   .ant-modal {
-    max-width: calc(100vw - 32px);
+    max-width: calc(100vw - 20px) !important;
+    margin: 10px auto !important;
   }
 }
 
-/* Скроллбар */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-thumb {
-  background: #d9d9d9;
-  border-radius: 3px;
+@media (max-width: 480px) {
+  .app-container {
+    padding: 0.75rem;
+  }
 }
 
-/* Формы */
+
 .ant-form-item-label {
   white-space: normal !important;
+  line-height: 1.4;
 }
 
-/* Анимации */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.ant-modal-content {
+  border-radius: 8px !important;
+}
+
+
+@media print {
+  body {
+    background: none;
+    padding: 0;
+  }
+  
+  .app-container {
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    max-width: 100%;
+  }
 }

@@ -1,43 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Table,
-  Button,
-  Modal,
-  Form,
-  Input,
-  DatePicker,
-  InputNumber,
-  Space,
+import { 
+  Table, 
+  Button, 
+  Modal, 
+  Form, 
+  Input, 
+  DatePicker, 
+  InputNumber, 
+  Space, 
   message
 } from 'antd';
-import { 
-  SearchOutlined, 
-  PlusOutlined, 
-  EditOutlined, 
-  DeleteOutlined 
-} from '@ant-design/icons';
+import { SearchOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-
-
-const { Column } = Table;
-const { Search } = Input;
+import './DataTable.css';
 
 const DataTable = () => {
   const [data, setData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingKey, setEditingKey] = useState('');
   const [searchText, setSearchText] = useState('');
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [isMobile, setIsMobile] = useState(false);
   const [form] = Form.useForm();
 
-  // Определяем размер экрана
+  
   useEffect(() => {
-    const handleResize = () => setScreenWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Тестовые данные
+  
   useEffect(() => {
     setData([
       {
@@ -61,33 +56,28 @@ const DataTable = () => {
     ]);
   }, []);
 
-  // Поиск
+
   const handleSearch = (value) => {
     setSearchText(value.toLowerCase());
   };
 
-  // Фильтрация данных
-  const filteredData = data.filter(item => {
-    return Object.entries(item).some(([key, val]) => {
-      if (val == null) return false;
+  
+  const filteredData = data.filter(item =>
+    Object.entries(item).some(([key, val]) => {
+      if (!val) return false;
       const search = searchText.toLowerCase();
-
-      if (key === 'value') {
-        return val.toString().includes(search);
-      }
-
+      
+      if (key === 'value') return val.toString().includes(search);
       if (key === 'date') {
-        const formats = ['DD.MM.YYYY', 'YYYY-MM-DD', 'D.M.YYYY'];
-        return formats.some(format => 
+        return ['DD.MM.YYYY', 'YYYY-MM-DD'].some(format => 
           dayjs(val).format(format).toLowerCase().includes(search)
         );
       }
-
       return val.toString().toLowerCase().includes(search);
-    });
-  });
+    })
+  );
 
-  // Модальное окно
+ 
   const showModal = () => {
     form.resetFields();
     setEditingKey('');
@@ -132,86 +122,81 @@ const DataTable = () => {
       });
   };
 
-  // Адаптивные стили
-  const isMobile = screenWidth < 768;
+  
+  const columns = [
+    {
+      title: 'Имя',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text) => <div className="cell">{text}</div>
+    },
+    {
+      title: 'Дата',
+      dataIndex: 'date',
+      key: 'date',
+      render: (date) => <div className="cell">{dayjs(date).format('DD.MM.YYYY')}</div>
+    },
+    {
+      title: 'Значение',
+      dataIndex: 'value',
+      key: 'value',
+      render: (value) => <div className="cell">{value}</div>
+    },
+    {
+      title: 'Действия',
+      key: 'action',
+      responsive: ['md'], 
+      render: (_, record) => (
+        <Space size="small">
+          <Button
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            size="small"
+          />
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.key)}
+            size="small"
+          />
+        </Space>
+      )
+    }
+  ];
 
   return (
     <div className="table-container">
-      <div className="table-controls">
-        <Search
+      <div className={`controls ${isMobile ? 'mobile' : ''}`}>
+        <Input.Search
           placeholder="Поиск..."
           allowClear
           enterButton={<SearchOutlined />}
-          className="search-input"
+          size={isMobile ? 'large' : 'middle'}
           onSearch={handleSearch}
-          onChange={(e) => handleSearch(e.target.value)}
+          style={{ width: isMobile ? '100%' : 300 }}
         />
         <Button 
           type="primary" 
-          icon={<PlusOutlined />} 
+          icon={<PlusOutlined />}
           onClick={showModal}
-          className="add-button"
+          size={isMobile ? 'large' : 'middle'}
+          className="add-btn"
         >
-          {isMobile ? '' : 'Добавить'}
+          {!isMobile && 'Добавить'}
         </Button>
       </div>
 
-      <Table
-        dataSource={filteredData}
-        bordered
-        pagination={{ 
-          pageSize: 5,
-          responsive: true,
-          size: isMobile ? 'small' : 'default'
-        }}
-        scroll={{ x: true }}
-        size={isMobile ? 'small' : 'middle'}
-      >
-        <Column
-          title="Имя"
-          dataIndex="name"
-          key="name"
-          width={isMobile ? 120 : 200}
-          sorter={(a, b) => a.name.localeCompare(b.name)}
-        />
-        <Column
-          title="Дата"
-          dataIndex="date"
-          key="date"
-          width={isMobile ? 100 : 150}
-          sorter={(a, b) => new Date(a.date) - new Date(b.date)}
-          render={(date) => dayjs(date).format('DD.MM.YYYY')}
-        />
-        <Column
-          title="Значение"
-          dataIndex="value"
-          key="value"
-          width={isMobile ? 80 : 100}
-          sorter={(a, b) => a.value - b.value}
-        />
-        <Column
-          title="Действия"
-          key="action"
-          width={isMobile ? 90 : 120}
-          render={(_, record) => (
-            <Space size="small">
-              <Button
-                type="text"
-                icon={<EditOutlined />}
-                onClick={() => handleEdit(record)}
-                size={isMobile ? 'small' : 'middle'}
-              />
-              <Button
-                type="text"
-                danger
-                icon={<DeleteOutlined />}
-                onClick={() => handleDelete(record.key)}
-                size={isMobile ? 'small' : 'middle'}
-              />
-            </Space>
-          )}
-        />
-      </Table>
+      <div className="table-wrapper">
+        <Table
+      columns={columns}
+      dataSource={filteredData}
+      pagination={false}
+     bordered
+     size={isMobile ? 'small' : 'middle'}
+      className="responsive-table"
+       scroll={{ x: 'max-content' }} 
+/>
+      </div>
 
       <Modal
         title={editingKey ? 'Редактировать запись' : 'Добавить запись'}
@@ -220,7 +205,8 @@ const DataTable = () => {
         onCancel={() => setIsModalVisible(false)}
         okText={editingKey ? 'Обновить' : 'Добавить'}
         cancelText="Отмена"
-        width={isMobile ? '90%' : '50%'}
+        width={isMobile ? '90%' : '60%'}
+        className="data-modal"
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -228,7 +214,7 @@ const DataTable = () => {
             label="Имя"
             rules={[{ required: true, message: 'Введите имя' }]}
           >
-            <Input placeholder="Иван Иванов" />
+            <Input size={isMobile ? 'large' : 'middle'} />
           </Form.Item>
           <Form.Item
             name="date"
@@ -236,8 +222,9 @@ const DataTable = () => {
             rules={[{ required: true, message: 'Выберите дату' }]}
           >
             <DatePicker 
-              style={{ width: '100%' }} 
-              format="DD.MM.YYYY" 
+              style={{ width: '100%' }}
+              format="DD.MM.YYYY"
+              size={isMobile ? 'large' : 'middle'}
             />
           </Form.Item>
           <Form.Item
@@ -246,8 +233,8 @@ const DataTable = () => {
             rules={[{ required: true, message: 'Введите число' }]}
           >
             <InputNumber 
-              style={{ width: '100%' }} 
-              placeholder="42" 
+              style={{ width: '100%' }}
+              size={isMobile ? 'large' : 'middle'}
             />
           </Form.Item>
         </Form>
