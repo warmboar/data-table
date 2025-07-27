@@ -1,10 +1,11 @@
+/* Базовые стили */
 body {
   margin: 0;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: #f0f2f5;
+  overflow-x: hidden;
 }
-
 
 .app-container {
   max-width: 1200px;
@@ -15,17 +16,65 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-
+/* Стили для таблицы */
 .ant-table-wrapper {
   overflow-x: auto;
 }
 
-
-body {
-  overflow-x: hidden;
+.ant-table {
+  animation: fadeIn 0.3s ease-out;
+  margin-top: 16px;
 }
 
+/* Контейнер для таблицы */
+.table-container {
+  padding: 12px;
+  max-width: 100%;
+  overflow-x: auto;
+}
 
+/* Элементы управления таблицей */
+.table-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: flex-start;
+}
+
+.search-input {
+  flex-grow: 1;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 767px) {
+  .app-container {
+    padding: 16px;
+  }
+
+  .table-controls {
+    flex-direction: column;
+  }
+  
+  .search-input,
+  .add-button {
+    width: 100% !important;
+  }
+
+  .ant-table {
+    font-size: 14px;
+  }
+  
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 8px !important;
+  }
+  
+  .ant-modal {
+    max-width: calc(100vw - 32px);
+  }
+}
+
+/* Скроллбар */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -35,10 +84,12 @@ body {
   border-radius: 3px;
 }
 
-.ant-table {
-  animation: fadeIn 0.3s ease-out;
+/* Формы */
+.ant-form-item-label {
+  white-space: normal !important;
 }
 
+/* Анимации */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
